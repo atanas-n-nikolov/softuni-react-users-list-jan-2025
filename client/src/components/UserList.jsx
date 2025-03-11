@@ -14,6 +14,7 @@ export default function UserList() {
     const [showCreate, setShowCreate] = useState(false);
     const [userIdInfo, setUserIdInfo] = useState(null);
     const [showDelete, setShowDelete] = useState(null);
+    const [userIdEdit, setUserIdEdit] = useState(null);
 
     useEffect(() => {
         userService.getAll()
@@ -29,6 +30,7 @@ export default function UserList() {
 
     const closeUserClickHandler = () => {
         setShowCreate(false);
+        setUserIdEdit(null)
     };
 
     const closeUserDetailsClickHandler = () => {
@@ -55,9 +57,28 @@ export default function UserList() {
         setShowDelete(null);
     }
 
+    const userEditClickHandler = (userId) => {
+        setUserIdEdit(userId);
+    }
+
+    const saveEditUserClickHandler = async (e) => {
+        const userId = userIdEdit;
+
+        e.preventDefault();
+
+        const formData = new FormData(e.target.parentElement.parentElement);
+        const userData = Object.fromEntries(formData);
+
+        const updatedUser = await userService.update(userId, userData);
+
+        setUsers(state => state.map(user => user._id === userId ? updatedUser : user))
+
+        setUserIdEdit(null)
+    }
+
     const saveCreateUserClickHandler = async (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
+        const formData = new FormData(e.target.parentElement.parentElement);
         const userData = Object.fromEntries(formData);
 
         if(!userData.firstName || !userData.lastName || !userData.email || !userData.phoneNumber || !userData.imageUrl || !userData.country || !userData.city || !userData.street || !userData.streetNumber){
@@ -81,6 +102,8 @@ export default function UserList() {
             {userIdInfo && <UserInfo onClose={closeUserDetailsClickHandler} userId={userIdInfo}/>}
 
             {showDelete && <UserDelete onClose={closeDeleteUserClickHandler} onDelete={userDeleteHandler} userId={showDelete}/>}
+
+            {userIdEdit && <UserCreate userId={userIdEdit} onClose={closeUserClickHandler} onSave={saveCreateUserClickHandler}  onEdit={saveEditUserClickHandler}/>}
 
             <div className="table-wrapper">
                 <div className="overlays">
@@ -189,7 +212,7 @@ export default function UserList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => <UserListItem key={user._id} {...user} getUser={userInfoClickHandler} deleteUser={deleteUserClickHandler}/>)}
+                        {users.map(user => <UserListItem key={user._id} {...user} getUser={userInfoClickHandler} deleteUser={deleteUserClickHandler} onEdit={userEditClickHandler}/>) }
                         
                     </tbody>
                 </table>
