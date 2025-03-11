@@ -7,11 +7,13 @@ import Search from "./Search";
 import userService from "../services/userService";
 import UserCreate from "./UserCreate";
 import UserInfo from "./UserInfo";
+import UserDelete from "./UserDelete";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
     const [showCreate, setShowCreate] = useState(false);
     const [userIdInfo, setUserIdInfo] = useState(null);
+    const [showDelete, setShowDelete] = useState(null);
 
     useEffect(() => {
         userService.getAll()
@@ -35,6 +37,22 @@ export default function UserList() {
 
     const userInfoClickHandler = (userId) => {
         setUserIdInfo(userId)
+    }
+
+    const deleteUserClickHandler = (userId) => {
+        setShowDelete(userId)
+    }
+
+    const closeDeleteUserClickHandler = () => {
+        setShowDelete(null);
+    }
+
+    const userDeleteHandler = async () => {
+        await userService.deleteUser(showDelete);
+
+        setUsers(state => state.filter(user => user._id !== showDelete));
+
+        setShowDelete(null);
     }
 
     const saveCreateUserClickHandler = async (e) => {
@@ -62,9 +80,10 @@ export default function UserList() {
 
             {userIdInfo && <UserInfo onClose={closeUserDetailsClickHandler} userId={userIdInfo}/>}
 
+            {showDelete && <UserDelete onClose={closeDeleteUserClickHandler} onDelete={userDeleteHandler} userId={showDelete}/>}
+
             <div className="table-wrapper">
                 <div className="overlays">
-                {/* <!-- Overlap components  --> */}
 
                 {/* <!-- <div className="loading-shade"> --> */}
                 {/* <!-- Loading spinner  --> */}
@@ -170,7 +189,7 @@ export default function UserList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => <UserListItem key={user._id} {...user} getUser={userInfoClickHandler}/>)}
+                        {users.map(user => <UserListItem key={user._id} {...user} getUser={userInfoClickHandler} deleteUser={deleteUserClickHandler}/>)}
                         
                     </tbody>
                 </table>

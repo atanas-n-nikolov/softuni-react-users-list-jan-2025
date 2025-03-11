@@ -32,5 +32,13 @@ export default {
         const user = await response.json();
         
         return user;
+    },
+    async deleteUser(userId) {
+        const response = await fetch(`${baseUrl}/${userId}`, {
+            method: 'DELETE'
+        });
+        const user = await response.json();
+
+        return user;
     }
 }

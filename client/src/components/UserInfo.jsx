@@ -11,7 +11,6 @@ export default function UserInfo({
   useEffect(() => {
     userService.getInfo(userId).then(result => {
       setUser(result)
-      console.log(user);
     })
   }, [userId]);
 
