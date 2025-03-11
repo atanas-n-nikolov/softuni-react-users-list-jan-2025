@@ -25,13 +25,31 @@ export default function UserList() {
 
     const closeUserClickHandler = () => {
         setShowCreate(false);
+    };
+
+    const saveCreateUserClickHandler = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const userData = Object.fromEntries(formData);
+
+        if(!userData.firstName || !userData.lastName || !userData.email || !userData.phoneNumber || !userData.imageUrl || !userData.country || !userData.city || !userData.street || !userData.streetNumber){
+            return window.alert('All fields required!')
+        }else {
+            const newUser = await userService.create(userData);
+
+            if(newUser) {
+                setShowCreate(false);
+                setUsers(state => [...state, newUser]);
+            }
+        }
+        
     }
 
     return (
         <section className="card users-container">
             <Search />
 
-            {showCreate && <UserCreate onClose={closeUserClickHandler}/>}
+            {showCreate && <UserCreate onClose={closeUserClickHandler} onSave={saveCreateUserClickHandler}/>}
 
             <div className="table-wrapper">
                 <div className="overlays">
