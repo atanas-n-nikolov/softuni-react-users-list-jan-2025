@@ -6,10 +6,12 @@ import Pagination from "./Pagination";
 import Search from "./Search";
 import userService from "../services/userService";
 import UserCreate from "./UserCreate";
+import UserInfo from "./UserInfo";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
     const [showCreate, setShowCreate] = useState(false);
+    const [userIdInfo, setUserIdInfo] = useState(null);
 
     useEffect(() => {
         userService.getAll()
@@ -27,6 +29,14 @@ export default function UserList() {
         setShowCreate(false);
     };
 
+    const closeUserDetailsClickHandler = () => {
+        setUserIdInfo(null);
+    }
+
+    const userInfoClickHandler = (userId) => {
+        setUserIdInfo(userId)
+    }
+
     const saveCreateUserClickHandler = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -42,7 +52,6 @@ export default function UserList() {
                 setUsers(state => [...state, newUser]);
             }
         }
-        
     }
 
     return (
@@ -50,6 +59,8 @@ export default function UserList() {
             <Search />
 
             {showCreate && <UserCreate onClose={closeUserClickHandler} onSave={saveCreateUserClickHandler}/>}
+
+            {userIdInfo && <UserInfo onClose={closeUserDetailsClickHandler} userId={userIdInfo}/>}
 
             <div className="table-wrapper">
                 <div className="overlays">
@@ -159,7 +170,7 @@ export default function UserList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => <UserListItem key={user._id} {...user}/>)}
+                        {users.map(user => <UserListItem key={user._id} {...user} getUser={userInfoClickHandler}/>)}
                         
                     </tbody>
                 </table>
