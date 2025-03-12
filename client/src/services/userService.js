@@ -16,7 +16,7 @@ export default {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(transformedData),
+            body: JSON.stringify(postData),
         });
 
         const result = await response.json();
@@ -39,9 +39,11 @@ export default {
     },
     async update(userId, userData) {
         const postData = transformUserData(userData);
+        delete postData.createdAt;
+
         postData._id = userId;
         const response = fetch(`${baseUrl}/${userId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },

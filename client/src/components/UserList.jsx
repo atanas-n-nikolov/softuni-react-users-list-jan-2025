@@ -10,7 +10,9 @@ import UserInfo from "./UserInfo";
 import UserDelete from "./UserDelete";
 
 export default function UserList() {
+    const [allUsers, setAllUsers] = useState([]);
     const [users, setUsers] = useState([]);
+    const [displayUsers, setDisplayUsers] = useState(5);
     const [showCreate, setShowCreate] = useState(false);
     const [userIdInfo, setUserIdInfo] = useState(null);
     const [showDelete, setShowDelete] = useState(null);
@@ -18,11 +20,16 @@ export default function UserList() {
 
     useEffect(() => {
         userService.getAll()
-        .then(result => {
-            setUsers(result);
-        })
-        .catch(err => console.log(err.message))
-    }, [])
+            .then(result => {
+                setAllUsers(result);
+                setUsers(result.slice(0, displayUsers));
+            })
+            .catch(err => console.log(err.message))
+    }, []);
+
+    useEffect(() => {
+        setUsers(allUsers.slice(0, displayUsers))
+    }, [displayUsers, allUsers]);
 
     const createUserClickHandler = () => {
         setShowCreate(true);
@@ -81,40 +88,48 @@ export default function UserList() {
         const formData = new FormData(e.target.parentElement.parentElement);
         const userData = Object.fromEntries(formData);
 
-        if(!userData.firstName || !userData.lastName || !userData.email || !userData.phoneNumber || !userData.imageUrl || !userData.country || !userData.city || !userData.street || !userData.streetNumber){
+        if (!userData.firstName || !userData.lastName || !userData.email || !userData.phoneNumber || !userData.imageUrl || !userData.country || !userData.city || !userData.street || !userData.streetNumber) {
             return window.alert('All fields required!')
-        }else {
+        } else {
             const newUser = await userService.create(userData);
 
-            if(newUser) {
+            if (newUser) {
                 setShowCreate(false);
-                setUsers(state => [...state, newUser]);
+                const updatedAllUsers = [...allUsers, newUser];
+                setAllUsers(updatedAllUsers);
+
+                setUsers(updatedAllUsers.slice(0, displayUsers));
             }
         }
+    }
+
+    const selectValueHandler = (e) => {
+        const selectValue = Number(e.target.value);
+        setDisplayUsers(selectValue);
     }
 
     return (
         <section className="card users-container">
             <Search />
 
-            {showCreate && <UserCreate onClose={closeUserClickHandler} onSave={saveCreateUserClickHandler}/>}
+            {showCreate && <UserCreate onClose={closeUserClickHandler} onSave={saveCreateUserClickHandler} />}
 
-            {userIdInfo && <UserInfo onClose={closeUserDetailsClickHandler} userId={userIdInfo}/>}
+            {userIdInfo && <UserInfo onClose={closeUserDetailsClickHandler} userId={userIdInfo} />}
 
-            {showDelete && <UserDelete onClose={closeDeleteUserClickHandler} onDelete={userDeleteHandler} userId={showDelete}/>}
+            {showDelete && <UserDelete onClose={closeDeleteUserClickHandler} onDelete={userDeleteHandler} userId={showDelete} />}
 
-            {userIdEdit && <UserCreate userId={userIdEdit} onClose={closeUserClickHandler} onSave={saveCreateUserClickHandler}  onEdit={saveEditUserClickHandler}/>}
+            {userIdEdit && <UserCreate userId={userIdEdit} onClose={closeUserClickHandler} onSave={saveCreateUserClickHandler} onEdit={saveEditUserClickHandler} />}
 
             <div className="table-wrapper">
                 <div className="overlays">
 
-                {/* <!-- <div className="loading-shade"> --> */}
-                {/* <!-- Loading spinner  --> */}
-                {/* <!-- <div className="spinner"></div> --> */}
-                {/* <!--  */}
-                {/* No users added yet  --> */}
+                    {/* <!-- <div className="loading-shade"> --> */}
+                    {/* <!-- Loading spinner  --> */}
+                    {/* <!-- <div className="spinner"></div> --> */}
+                    {/* <!--  */}
+                    {/* No users added yet  --> */}
 
-                {/* <div className="table-overlap">
+                    {/* <div className="table-overlap">
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -133,9 +148,9 @@ export default function UserList() {
               <h2>There is no users yet.</h2>
             </div> */}
 
-                {/* <!-- On error overlap component  --> */}
+                    {/* <!-- On error overlap component  --> */}
 
-                {/* <div className="table-overlap">
+                    {/* <div className="table-overlap">
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -153,7 +168,7 @@ export default function UserList() {
               </svg>
               <h2>Failed to fetch</h2>
             </div> */}
-                {/* <!-- </div> --> */}
+                    {/* <!-- </div> --> */}
                 </div>
 
                 <table className="table">
@@ -212,8 +227,8 @@ export default function UserList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => <UserListItem key={user._id} {...user} getUser={userInfoClickHandler} deleteUser={deleteUserClickHandler} onEdit={userEditClickHandler}/>) }
-                        
+                        {users.map(user => <UserListItem key={user._id} {...user} getUser={userInfoClickHandler} deleteUser={deleteUserClickHandler} onEdit={userEditClickHandler} />)}
+
                     </tbody>
                 </table>
             </div>
@@ -221,7 +236,7 @@ export default function UserList() {
             {/* <!-- New user button  --> */}
             <button onClick={createUserClickHandler} className="btn-add btn">Add new user</button>
 
-            <Pagination />
+            <Pagination getValue={selectValueHandler} />
         </section>
     )
 }
