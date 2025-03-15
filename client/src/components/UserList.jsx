@@ -13,6 +13,7 @@ export default function UserList() {
     const [allUsers, setAllUsers] = useState([]);
     const [users, setUsers] = useState([]);
     const [pages, setPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
     const [displayUsers, setDisplayUsers] = useState(5);
     const [showCreate, setShowCreate] = useState(false);
     const [userIdInfo, setUserIdInfo] = useState(null);
@@ -26,11 +27,15 @@ export default function UserList() {
                 setUsers(result.slice(0, displayUsers));
             })
             .catch(err => console.log(err.message))
+        calculatePages();
     }, []);
 
     useEffect(() => {
-        setUsers(allUsers.slice(0, displayUsers))
-    }, [displayUsers, allUsers]);
+        const startIndex = (currentPage - 1) * displayUsers;
+        const endIndex = startIndex + displayUsers;
+        setUsers(allUsers.slice(startIndex, endIndex));
+        calculatePages();
+    }, [displayUsers, allUsers, currentPage]);
 
     const createUserClickHandler = () => {
         setShowCreate(true);
@@ -110,11 +115,14 @@ export default function UserList() {
     };
 
     const calculatePages = () => {
-        const pageValue = Math.floor((users.length - 1) / displayUsers);
-        if (pageValue < 1) {
-            pageValue = 1;
+        const totalUsers = allUsers.length;
+        const pageValue = Math.ceil(totalUsers / displayUsers);
+        setPages(pageValue || 1);
+
+        if (currentPage > pageValue) {
+            setCurrentPage(pageValue || 1);
         }
-    }
+    };
 
     return (
         <section className="card users-container">
@@ -244,7 +252,10 @@ export default function UserList() {
             {/* <!-- New user button  --> */}
             <button onClick={createUserClickHandler} className="btn-add btn">Add new user</button>
 
-            <Pagination getValue={selectValueHandler} pages={pages} />
+            <Pagination getValue={selectValueHandler}
+                currentPage={currentPage}
+                totalPages={pages}
+                onPageChange={setCurrentPage} />
         </section>
     )
 }

@@ -1,4 +1,4 @@
-export default function Pagination({ getValue, pages }) {
+export default function Pagination({ getValue, currentPage, totalPages, onPageChange }) {
     
     return (
         <div className="pagination position">
@@ -11,9 +11,9 @@ export default function Pagination({ getValue, pages }) {
                     <option value="20">20</option>
                 </select>
             </div>
-            <p className="pages">1 - {pages} of {pages}</p>
+            <p className="pages">1 - {currentPage} of {totalPages}</p>
             <div className="actions">
-                <button className="btn" title="First Page">
+                <button onClick={() => onPageChange(1)} disabled={currentPage === 1} className="btn" title="First Page">
                     <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angles-left"
                         className="svg-inline--fa fa-angles-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                         <path fill="currentColor"
@@ -22,7 +22,7 @@ export default function Pagination({ getValue, pages }) {
                     </svg>
                 </button>
 
-                <button className="btn" title="Previous Page">
+                <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="btn" title="Previous Page">
                     <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-left"
                         className="svg-inline--fa fa-angle-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
                         <path fill="currentColor"
@@ -30,7 +30,7 @@ export default function Pagination({ getValue, pages }) {
                         </path>
                     </svg>
                 </button>
-                <button className="btn" title="Next Page">
+                <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="btn" title="Next Page">
                     <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right"
                         className="svg-inline--fa fa-angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
                         <path fill="currentColor"
@@ -39,7 +39,7 @@ export default function Pagination({ getValue, pages }) {
                     </svg>
                 </button>
 
-                <button className="btn" title="Last Page">
+                <button onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages} className="btn" title="Last Page">
                     <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angles-right"
                         className="svg-inline--fa fa-angles-right" role="img" xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 448 512">
