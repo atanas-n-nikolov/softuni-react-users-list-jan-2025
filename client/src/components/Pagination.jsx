@@ -1,4 +1,4 @@
-export default function Pagination({ getValue }) {
+export default function Pagination({ getValue, pages }) {
     
     return (
         <div className="pagination position">
@@ -11,7 +11,7 @@ export default function Pagination({ getValue }) {
                     <option value="20">20</option>
                 </select>
             </div>
-            <p className="pages">1 - 1 of 1</p>
+            <p className="pages">1 - {pages} of {pages}</p>
             <div className="actions">
                 <button className="btn" title="First Page">
                     <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angles-left"

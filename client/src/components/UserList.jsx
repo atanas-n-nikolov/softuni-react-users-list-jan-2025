@@ -12,6 +12,7 @@ import UserDelete from "./UserDelete";
 export default function UserList() {
     const [allUsers, setAllUsers] = useState([]);
     const [users, setUsers] = useState([]);
+    const [pages, setPages] = useState(1);
     const [displayUsers, setDisplayUsers] = useState(5);
     const [showCreate, setShowCreate] = useState(false);
     const [userIdInfo, setUserIdInfo] = useState(null);
@@ -106,6 +107,13 @@ export default function UserList() {
     const selectValueHandler = (e) => {
         const selectValue = Number(e.target.value);
         setDisplayUsers(selectValue);
+    };
+
+    const calculatePages = () => {
+        const pageValue = Math.floor((users.length - 1) / displayUsers);
+        if (pageValue < 1) {
+            pageValue = 1;
+        }
     }
 
     return (
@@ -236,7 +244,7 @@ export default function UserList() {
             {/* <!-- New user button  --> */}
             <button onClick={createUserClickHandler} className="btn-add btn">Add new user</button>
 
-            <Pagination getValue={selectValueHandler} />
+            <Pagination getValue={selectValueHandler} pages={pages} />
         </section>
     )
 }
